@@ -1,67 +1,44 @@
-# Files + Uploader for simplywasreal-jpg.github.io
+# Asset Hub — simplywasreal-jpg.github.io
 
-This repository hosts a simple download site (GitHub Pages) and an optional uploader service that commits uploaded files into the repo under `/files` so they become available for download.
+This repository hosts a professional-looking downloads gallery for sharing game-ready 3D models and assets via GitHub Pages.
 
-Security note
-- Never commit or expose your GitHub token in the repository.
-- Only run the uploader on a trusted host or keep it private and accessible only to you.
-- If you want public uploads from anyone, read the "Public upload" notes below — that requires extra protections.
+What changed
+- A redesigned `index.html` with a polished, responsive grid layout, search, format filters, sorting, and image preview for common image types.
+- A new stylesheet at `assets/styles.css` to keep presentation separate from markup.
+- The uploader service and instructions remain the same — uploader runs separately and commits files into the `/files` folder.
 
-Contents
-- `index.html` — the GitHub Pages front-end that lists files in `/files`.
-- `uploader/` — a small Node.js Express app that receives uploads and writes them to the repo via GitHub API.
-- `/files` — (create this folder) uploaded files will be placed here by the uploader or git.
+How it works
+- The site queries the GitHub Contents API to list files placed in the `files/` folder of this repository.
+- Anyone can download files from the site; only a user with a repository write token (you) can upload via the separate uploader server (or push via git).
 
-Quick start — using GitHub Pages (site)
-1. Add `index.html` to the repo root (or `docs/`) and enable GitHub Pages from `main` branch (Repository Settings → Pages).
-2. Create a `files/` folder in the repo. Upload at least one file (via git or uploader) so the index shows content.
+Recommended workflow for adding assets (admin-only)
+1. Create or obtain your asset files (zip, fbx, obj, gltf, blend).
+2. Either:
+   - Run the uploader (see `uploader/`) and POST your file to it (recommended for convenience), or
+   - Push files directly to `files/` via git:
+     ```
+     git clone https://github.com/simplywasreal-jpg/simplywasreal-jpg.github.io.git
+     cd simplywasreal-jpg.github.io
+     mkdir -p files
+     cp /path/to/asset.zip files/
+     git add files/asset.zip
+     git commit -m "Add medieval-rock_1ktris.zip"
+     git push
+     ```
 
-Manual upload via git (easiest, safest)
-1. Clone the repo locally:
-   git clone https://github.com/simplywasreal-jpg/simplywasreal-jpg.github.io.git
-2. Copy files into `files/`, then:
-   git add files/*
-   git commit -m "Add files"
-   git push
+Security reminders
+- Never publish your GitHub token. Keep uploader tokens in environment variables.
+- Limit accepted file types and sizes if you ever expose an uploader publicly.
+- Consider a separate machine user for uploads and scanning uploads before publishing.
 
-Uploader (server) — overview
-- The uploader accepts multipart/form-data file uploads and uses a GitHub Personal Access Token to create a file in `files/{filename}` in this repo.
-- You should store the token as an environment variable and deploy the uploader to a private host (Render, Fly, Railway, Heroku, etc.).
+Customization ideas
+- Add per-asset metadata files (JSON) to store tags, descriptions, polycount, license, and thumbnails.
+- Add pagination for very large libraries.
+- Add server-side caching or a small JSON index to avoid repeated API calls for large collections.
 
-Uploader setup
-1. Create a GitHub token (repo scope or `repo.contents`) for an account that can push to this repository.
-2. Deploy the uploader with the following environment variables:
-   - GITHUB_TOKEN (the token)
-   - REPO_OWNER (simplywasreal-jpg)
-   - REPO_NAME (simplywasreal-jpg.github.io)
-   - BRANCH (optional, default `main`)
-3. Example: run locally
-   cd uploader
-   npm install
-   export GITHUB_TOKEN=ghp_...
-   export REPO_OWNER=simplywasreal-jpg
-   export REPO_NAME=simplywasreal-jpg.github.io
-   export BRANCH=main
-   node server.js
-   # POST files to http://localhost:3000/upload
+If you'd like
+- I can commit the new files to your repo now.
+- I can add optional per-asset metadata support (README shows format), and a small script to generate thumbnails or a JSON index.
+- I can add a minimal admin UI that talks to the uploader so you can upload from a browser (password-protected).
 
-Security recommendations
-- Never put the token into client-side code.
-- Consider creating a separate GitHub machine user for uploads.
-- Limit upload size and filetypes on the uploader.
-- Scan uploaded files if you plan to accept uploads from the public.
-
-Public upload notes
-If you want anyone to upload files:
-- You must add authentication/verification (captcha, account sign-ins).
-- Add content moderation (manual review) and virus scanning.
-- Consider using a managed file storage (S3, Google Cloud Storage) and a separate database referencing files.
-
-If you want, I can:
-- Add the `uploader/` code below and a GitHub Actions workflow that builds/deploys it to a chosen provider, or
-- Implement a full serverless solution (Netlify Functions / Cloudflare / AWS Lambda) to handle uploads securely, or
-- Make the site allow uploads with GitHub OAuth (more setup).
-
-Tell me:
-- Confirm GitHub Pages hosting on this repo is ok.
-- Who should be allowed to upload (only you, specific people, or anyone).
+Tell me which of these you'd like me to do next and I will proceed.

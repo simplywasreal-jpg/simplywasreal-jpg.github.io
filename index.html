@@ -3,97 +3,296 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Files — simplywasreal-jpg</title>
-  <style>
-    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; max-width:900px; margin:40px auto; padding:0 16px; color:#111; }
-    header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;}
-    h1 { margin:0; font-size:1.4rem;}
-    .note { color:#555; font-size:0.92rem; }
-    ul.files { list-style:none; padding:0; }
-    li.file { padding:12px; border:1px solid #eee; margin-bottom:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;}
-    .meta { color:#555; font-size:0.9rem; }
-    .actions a { text-decoration:none; color:#fff; background:#0366d6; padding:6px 10px; border-radius:6px; font-size:0.9rem; }
-    .uploader { margin-top:20px; padding:12px; border-radius:8px; background:#fafafa; border:1px dashed #eee;}
-    .small { font-size:0.9rem; color:#666; }
-    footer { margin-top:40px; color:#666; font-size:0.85rem; }
-  </style>
+  <title>Asset Hub — simplywasreal-jpg</title>
+  <meta name="description" content="Download game-ready 3D models and assets from simplywasreal-jpg" />
+  <link rel="stylesheet" href="assets/styles.css">
 </head>
 <body>
-  <header>
-    <h1>Downloads — simplywasreal-jpg</h1>
-    <div class="note">Files stored in <code>/files</code></div>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="/">
+        <svg class="logo" viewBox="0 0 48 48" width="36" height="36" aria-hidden><rect x="6" y="6" width="36" height="36" rx="6" fill="#0366d6"/><path d="M14 30 L20 18 L28 34 L34 18" stroke="#fff" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Asset Hub</span>
+      </a>
+
+      <nav class="header-actions">
+        <a class="btn btn-muted" href="README.md" target="_blank" rel="noopener">Uploader & Docs</a>
+        <a class="btn btn-primary" href="#upload-info">How to upload</a>
+      </nav>
+    </div>
   </header>
 
-  <section>
-    <div class="small">If you are the site owner and want to upload files, see the uploader instructions in the repository README. (Uploader runs separately — do NOT upload tokens in this site.)</div>
+  <main class="container">
+    <section class="hero">
+      <h1>Game-ready 3D models & assets</h1>
+      <p class="lead">Browse, search and download models shared by simplywasreal-jpg. Common formats: <strong>.fbx .obj .gltf .blend .zip</strong>.</p>
 
-    <h2 style="margin-top:18px">Available files</h2>
-    <ul id="fileList" class="files"></ul>
+      <div class="controls">
+        <div class="search">
+          <input id="searchInput" type="search" placeholder="Search by filename, format, or tag (example: character, prop)"/>
+        </div>
 
-    <div id="emptyNote" class="note" style="display:none;">No files yet. Upload files to the <code>/files</code> folder in this repository or use the uploader.</div>
+        <div class="filters">
+          <label>Filter:</label>
+          <div id="filterButtons" class="filter-buttons" aria-hidden>
+            <button data-ext="" class="filter active">All</button>
+            <button data-ext=".fbx" class="filter">FBX</button>
+            <button data-ext=".obj" class="filter">OBJ</button>
+            <button data-ext=".gltf" class="filter">glTF</button>
+            <button data-ext=".blend" class="filter">BLEND</button>
+            <button data-ext=".zip" class="filter">ZIP</button>
+            <button data-ext=".png,.jpg,.jpeg,.gif" class="filter">Images</button>
+          </div>
+        </div>
 
-    <div class="uploader">
-      <strong>Admin uploader</strong>
-      <div class="small" style="margin-top:6px">
-        This page only lists files. To upload files you must run the uploader server (instructions in README). You can also push files to the <code>/files</code> folder directly via git.
+        <div class="sort">
+          <label for="sortSelect">Sort:</label>
+          <select id="sortSelect">
+            <option value="name">Name (A–Z)</option>
+            <option value="size">Size (smallest)</option>
+          </select>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <footer>
-    <div>Repository: <a href="https://github.com/simplywasreal-jpg/simplywasreal-jpg.github.io">simplywasreal-jpg/simplywasreal-jpg.github.io</a></div>
+    <section>
+      <div id="resultsInfo" class="results-info" aria-live="polite"></div>
+      <div id="grid" class="grid" role="list"></div>
+      <div id="empty" class="empty" style="display:none;">No files found. Upload assets to the <code>/files</code> folder or use the uploader.</div>
+    </section>
+
+    <section id="upload-info" class="upload-info">
+      <h2>How to upload (admin only)</h2>
+      <p>Only you (the repository owner) should upload. Use the separate uploader service described in <a href="README.md" target="_blank" rel="noopener">the README</a>, or add files directly via git to <code>/files</code>.</p>
+      <ol>
+        <li>Create a GitHub Personal Access Token with repo write access.</li>
+        <li>Run the uploader server (see README) or push files with git to <code>/files</code>.</li>
+      </ol>
+      <p class="muted">Tip: name files with descriptive names and include format and polycount in the filename (eg. <code>medieval-rock_1ktris_fbx.zip</code>).</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>Repository: <a href="https://github.com/simplywasreal-jpg/simplywasreal-jpg.github.io" target="_blank" rel="noopener">simplywasreal-jpg/simplywasreal-jpg.github.io</a></div>
+      <div class="muted">Hosted on GitHub Pages · Admin uploader required to add files</div>
+    </div>
   </footer>
 
+  <!-- Preview modal -->
+  <div id="previewModal" class="modal" aria-hidden>
+    <div class="modal-panel">
+      <button id="modalClose" class="modal-close" aria-label="Close preview">&times;</button>
+      <div id="modalContent" class="modal-content"></div>
+      <div id="modalMeta" class="modal-meta"></div>
+    </div>
+  </div>
+
 <script>
-  // Configuration: repo owner/name and path to list
+  // Configuration
   const owner = "simplywasreal-jpg";
   const repo = "simplywasreal-jpg.github.io";
-  const path = "files"; // folder in repo where uploaded files will be stored
-  const ref = "main"; // branch; change this if your default branch is 'master' or other
+  const path = "files";
+  const ref = "main";
 
-  async function loadFiles() {
-    const fileListEl = document.getElementById('fileList');
-    const emptyNote = document.getElementById('emptyNote');
+  // Elements
+  const grid = document.getElementById('grid');
+  const empty = document.getElementById('empty');
+  const searchInput = document.getElementById('searchInput');
+  const filterButtons = document.getElementById('filterButtons');
+  const sortSelect = document.getElementById('sortSelect');
+  const resultsInfo = document.getElementById('resultsInfo');
+  const previewModal = document.getElementById('previewModal');
+  const modalContent = document.getElementById('modalContent');
+  const modalMeta = document.getElementById('modalMeta');
+  const modalClose = document.getElementById('modalClose');
+
+  let items = [];
+  let activeFilter = '';
+  let searchTerm = '';
+
+  function extOf(name) {
+    const m = name.match(/(\.[^.]+)$/);
+    return m ? m[1].toLowerCase() : '';
+  }
+
+  function friendlySize(bytes) {
+    if (bytes == null) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+    return (bytes/1024/1024).toFixed(2) + ' MB';
+  }
+
+  function iconFor(ext) {
+    if (!ext) return '📁';
+    const map = {
+      '.fbx':'🧩', '.obj':'🔷', '.gltf':'🔶', '.glb':'🔶', '.blend':'🎛️',
+      '.zip':'📦', '.rar':'📦', '.7z':'📦', '.png':'🖼️', '.jpg':'🖼️', '.jpeg':'🖼️', '.gif':'🖼️'
+    };
+    return map[ext] || '📄';
+  }
+
+  async function fetchFiles() {
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${ref}`;
-
     try {
       const res = await fetch(url);
       if (res.status === 404) {
-        emptyNote.style.display = 'block';
+        items = [];
+        render();
         return;
       }
-      if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
-
-      const items = await res.json();
-      if (!Array.isArray(items) || items.length === 0) {
-        emptyNote.style.display = 'block';
+      if (!res.ok) throw new Error('GitHub API returned ' + res.status);
+      const json = await res.json();
+      if (!Array.isArray(json)) {
+        items = [];
+        render();
         return;
       }
-
-      items.sort((a,b)=> (a.name||'').localeCompare(b.name||''));
-      for (const it of items) {
-        const li = document.createElement('li');
-        li.className = 'file';
-        const left = document.createElement('div');
-        left.innerHTML = `<div><strong>${it.name}</strong></div><div class="meta">${(it.size != null) ? Math.round(it.size/1024)+' KB' : ''} ${it.type}</div>`;
-        const right = document.createElement('div');
-        right.className = 'actions';
-        const dl = document.createElement('a');
-        dl.href = it.download_url || it.html_url;
-        dl.textContent = 'Download';
-        dl.target = '_blank';
-        right.appendChild(dl);
-        li.appendChild(left);
-        li.appendChild(right);
-        fileListEl.appendChild(li);
-      }
+      // Map to internal items
+      items = json.map(it => ({
+        name: it.name,
+        path: it.path,
+        download_url: it.download_url || it.html_url,
+        size: it.size || 0,
+        type: it.type,
+        ext: extOf(it.name)
+      }));
+      render();
     } catch (err) {
       console.error(err);
-      document.getElementById('fileList').innerHTML = `<li class="note">Error loading files: ${err.message}</li>`;
+      resultsInfo.textContent = 'Error loading files: ' + err.message;
     }
   }
 
-  loadFiles();
+  function render() {
+    grid.innerHTML = '';
+    let visible = items.slice();
+
+    // Search
+    if (searchTerm.trim()) {
+      const s = searchTerm.toLowerCase();
+      visible = visible.filter(i => (i.name || '').toLowerCase().includes(s));
+    }
+
+    // Filter
+    if (activeFilter) {
+      const exts = activeFilter.split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+      visible = visible.filter(i => exts.includes(i.ext));
+    }
+
+    // Sort
+    const sort = sortSelect.value;
+    if (sort === 'size') visible.sort((a,b)=> (a.size||0) - (b.size||0));
+    else visible.sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+
+    // Info
+    resultsInfo.textContent = `${visible.length} item${visible.length === 1 ? '' : 's'} found`;
+
+    if (visible.length === 0) {
+      empty.style.display = 'block';
+      return;
+    } else {
+      empty.style.display = 'none';
+    }
+
+    for (const it of visible) {
+      const card = document.createElement('article');
+      card.className = 'card';
+      card.setAttribute('role','listitem');
+
+      const left = document.createElement('div');
+      left.className = 'card-left';
+      const icon = document.createElement('div');
+      icon.className = 'card-icon';
+      icon.textContent = iconFor(it.ext);
+      left.appendChild(icon);
+
+      const body = document.createElement('div');
+      body.className = 'card-body';
+      const title = document.createElement('div');
+      title.className = 'card-title';
+      title.textContent = it.name;
+      body.appendChild(title);
+
+      const meta = document.createElement('div');
+      meta.className = 'card-meta';
+      meta.innerHTML = `<span class="badge">${it.ext || 'file'}</span> <span class="muted">${friendlySize(it.size)}</span>`;
+      body.appendChild(meta);
+
+      const actions = document.createElement('div');
+      actions.className = 'card-actions';
+      const dl = document.createElement('a');
+      dl.className = 'btn btn-primary';
+      dl.href = it.download_url;
+      dl.target = '_blank';
+      dl.rel = 'noopener';
+      dl.textContent = 'Download';
+      actions.appendChild(dl);
+
+      // If previewable image, add preview button
+      if (['.png','.jpg','.jpeg','.gif'].includes(it.ext)) {
+        const pv = document.createElement('button');
+        pv.className = 'btn btn-outline';
+        pv.textContent = 'Preview';
+        pv.addEventListener('click', () => openPreview(it));
+        actions.appendChild(pv);
+      }
+
+      card.appendChild(left);
+      card.appendChild(body);
+      card.appendChild(actions);
+      grid.appendChild(card);
+    }
+  }
+
+  function openPreview(item) {
+    modalContent.innerHTML = '';
+    modalMeta.textContent = `${item.name} • ${friendlySize(item.size)}`;
+    // Only preview images in this simple UI
+    if (['.png','.jpg','.jpeg','.gif'].includes(item.ext)) {
+      const img = document.createElement('img');
+      img.src = item.download_url;
+      img.alt = item.name;
+      img.className = 'preview-img';
+      modalContent.appendChild(img);
+    } else {
+      modalContent.textContent = 'Preview not available for this file type. Use Download to obtain the asset.';
+    }
+    previewModal.style.display = 'flex';
+    previewModal.setAttribute('aria-hidden','false');
+  }
+
+  function closePreview() {
+    previewModal.style.display = 'none';
+    previewModal.setAttribute('aria-hidden','true');
+    modalContent.innerHTML = '';
+  }
+
+  // Event bindings
+  searchInput.addEventListener('input', (e) => {
+    searchTerm = e.target.value || '';
+    render();
+  });
+
+  filterButtons.addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-ext]');
+    if (!btn) return;
+    // toggle active
+    [...filterButtons.querySelectorAll('button')].forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    activeFilter = btn.getAttribute('data-ext') || '';
+    render();
+  });
+
+  sortSelect.addEventListener('change', render);
+
+  modalClose.addEventListener('click', closePreview);
+  previewModal.addEventListener('click', (e) => {
+    if (e.target === previewModal) closePreview();
+  });
+
+  // Initial load
+  fetchFiles();
 </script>
 </body>
 </html>
