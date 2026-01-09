@@ -1,0 +1,16 @@
+{
+  "train_batch_size": 64,
+  "train_micro_batch_size_per_gpu": 4,
+  "steps_per_print": 100,
+  "optimizer": {
+    "type": "Adam",
+    "params": {"lr": 1e-4}
+  },
+  "zero_optimization": {
+    "stage": 3,
+    "offload_param": {"device":"none"},
+    "offload_optimizer": {"device":"none"}
+  },
+  "fp16": {"enabled": true},
+  "wall_clock_breakdown": false
+}
