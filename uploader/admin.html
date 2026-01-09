@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin Uploader — Asset Hub</title>
+  <style>
+    body{font-family:system-ui, -apple-system, 'Segoe UI', Roboto, Arial; background:#0b1220;color:#e6eef6;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+    .panel{width:420px;background:linear-gradient(180deg,#07101b,#081122);border-radius:12px;padding:18px;border:1px solid rgba(255,255,255,0.03)}
+    h1{margin:0 0 8px;font-size:18px}
+    label{display:block;margin-top:12px;font-size:13px;color:#9aa4b2}
+    input[type=file]{margin-top:8px}
+    input[type=password],input[type=text]{width:100%;padding:10px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+    .row{display:flex;gap:8px;margin-top:12px}
+    button{flex:1;padding:10px;border-radius:8px;border:none;background:#0366d6;color:#fff;font-weight:700;cursor:pointer}
+    .muted{color:#7f8b96;font-size:13px;margin-top:10px}
+    .success{color:#7ee787}
+    .error{color:#ff9aa2}
+  </style>
+</head>
+<body>
+  <div class="panel">
+    <h1>Admin Uploader</h1>
+    <div class="muted">Only enter the admin password (owner only). Files will be committed to <code>/files</code>.</div>
+
+    <label for="file">Choose file</label>
+    <input id="file" type="file" />
+
+    <label for="password">Admin password</label>
+    <input id="password" type="password" autocomplete="off" />
+
+    <div class="row">
+      <button id="uploadBtn">Upload</button>
+      <button id="clearBtn" style="background:transparent;border:1px solid rgba(255,255,255,0.04);color:#9aa4b2">Clear</button>
+    </div>
+
+    <div id="message" class="muted" aria-live="polite"></div>
+  </div>
+
+<script>
+  const uploadBtn = document.getElementById('uploadBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const fileInput = document.getElementById('file');
+  const passwordInput = document.getElementById('password');
+  const message = document.getElementById('message');
+
+  uploadBtn.addEventListener('click', async () => {
+    message.textContent = '';
+    const f = fileInput.files[0];
+    const pw = passwordInput.value;
+    if (!f) return message.textContent = 'Select a file to upload.';
+    if (!pw) return message.textContent = 'Enter admin password.';
+
+    const fd = new FormData();
+    fd.append('file', f);
+    fd.append('password', pw);
+
+    uploadBtn.disabled = true;
+    uploadBtn.textContent = 'Uploading...';
+
+    try {
+      const res = await fetch('/admin/upload', {
+        method: 'POST',
+        body: fd
+      });
+      const json = await res.json();
+      if (!res.ok) throw json;
+      message.className = 'success';
+      message.textContent = `Uploaded: ${json.path}`;
+      fileInput.value = '';
+      passwordInput.value = '';
+    } catch (err) {
+      console.error(err);
+      message.className = 'error';
+      message.textContent = err && err.error ? (err.error + (err.details ? (': '+JSON.stringify(err.details)) : '')) : 'Upload failed';
+    } finally {
+      uploadBtn.disabled = false;
+      uploadBtn.textContent = 'Upload';
+    }
+  });
+
+  clearBtn.addEventListener('click', () => { fileInput.value=''; passwordInput.value=''; message.textContent=''; });
+</script>
+</body>
+</html>
