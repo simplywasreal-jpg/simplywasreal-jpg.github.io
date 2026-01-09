@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Files — simplywasreal-jpg</title>
+  <style>
+    body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; max-width:900px; margin:40px auto; padding:0 16px; color:#111; }
+    header { display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;}
+    h1 { margin:0; font-size:1.4rem;}
+    .note { color:#555; font-size:0.92rem; }
+    ul.files { list-style:none; padding:0; }
+    li.file { padding:12px; border:1px solid #eee; margin-bottom:8px; border-radius:6px; display:flex; justify-content:space-between; align-items:center;}
+    .meta { color:#555; font-size:0.9rem; }
+    .actions a { text-decoration:none; color:#fff; background:#0366d6; padding:6px 10px; border-radius:6px; font-size:0.9rem; }
+    .uploader { margin-top:20px; padding:12px; border-radius:8px; background:#fafafa; border:1px dashed #eee;}
+    .small { font-size:0.9rem; color:#666; }
+    footer { margin-top:40px; color:#666; font-size:0.85rem; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Downloads — simplywasreal-jpg</h1>
+    <div class="note">Files stored in <code>/files</code></div>
+  </header>
+
+  <section>
+    <div class="small">If you are the site owner and want to upload files, see the uploader instructions in the repository README. (Uploader runs separately — do NOT upload tokens in this site.)</div>
+
+    <h2 style="margin-top:18px">Available files</h2>
+    <ul id="fileList" class="files"></ul>
+
+    <div id="emptyNote" class="note" style="display:none;">No files yet. Upload files to the <code>/files</code> folder in this repository or use the uploader.</div>
+
+    <div class="uploader">
+      <strong>Admin uploader</strong>
+      <div class="small" style="margin-top:6px">
+        This page only lists files. To upload files you must run the uploader server (instructions in README). You can also push files to the <code>/files</code> folder directly via git.
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div>Repository: <a href="https://github.com/simplywasreal-jpg/simplywasreal-jpg.github.io">simplywasreal-jpg/simplywasreal-jpg.github.io</a></div>
+  </footer>
+
+<script>
+  // Configuration: repo owner/name and path to list
+  const owner = "simplywasreal-jpg";
+  const repo = "simplywasreal-jpg.github.io";
+  const path = "files"; // folder in repo where uploaded files will be stored
+  const ref = "main"; // branch; change this if your default branch is 'master' or other
+
+  async function loadFiles() {
+    const fileListEl = document.getElementById('fileList');
+    const emptyNote = document.getElementById('emptyNote');
+    const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${ref}`;
+
+    try {
+      const res = await fetch(url);
+      if (res.status === 404) {
+        emptyNote.style.display = 'block';
+        return;
+      }
+      if (!res.ok) throw new Error(`GitHub API returned ${res.status}`);
+
+      const items = await res.json();
+      if (!Array.isArray(items) || items.length === 0) {
+        emptyNote.style.display = 'block';
+        return;
+      }
+
+      items.sort((a,b)=> (a.name||'').localeCompare(b.name||''));
+      for (const it of items) {
+        const li = document.createElement('li');
+        li.className = 'file';
+        const left = document.createElement('div');
+        left.innerHTML = `<div><strong>${it.name}</strong></div><div class="meta">${(it.size != null) ? Math.round(it.size/1024)+' KB' : ''} ${it.type}</div>`;
+        const right = document.createElement('div');
+        right.className = 'actions';
+        const dl = document.createElement('a');
+        dl.href = it.download_url || it.html_url;
+        dl.textContent = 'Download';
+        dl.target = '_blank';
+        right.appendChild(dl);
+        li.appendChild(left);
+        li.appendChild(right);
+        fileListEl.appendChild(li);
+      }
+    } catch (err) {
+      console.error(err);
+      document.getElementById('fileList').innerHTML = `<li class="note">Error loading files: ${err.message}</li>`;
+    }
+  }
+
+  loadFiles();
+</script>
+</body>
+</html>
